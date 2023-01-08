@@ -32,7 +32,7 @@ protected:
 public:
 	BinaryTree(const BinaryTreeNode<T>* = nullptr);	// OK
 	BinaryTree(const BinaryTree&);			// OK
-	BinaryTree(BinaryTree&&);				// OK
+	BinaryTree(BinaryTree&&);			// OK
 	virtual ~BinaryTree() = 0;
 
 	virtual BinaryTree& operator = (const BinaryTree&) = 0;	//todo not pure virtual
@@ -48,13 +48,13 @@ public:
 	virtual BinaryTree* operator - (const T&) const = 0;
 	virtual BinaryTree& operator -= (const T&) = 0;
 
-	virtual void			merge(const BinaryTree&) = 0;
-	virtual void			exclude(const BinaryTree&) = 0;
+	virtual void merge(const BinaryTree&) = 0;
+	virtual void exclude(const BinaryTree&) = 0;
 
-	virtual void			insert(const T&, size_t = 1) = 0;
-	virtual bool			remove(const T&, size_t = 1) = 0;
-	virtual bool			removeAll(const T&) = 0;
-	virtual BinaryTreeNode<T>*	search(const T&) const = 0;
+	virtual void		insert(const T&, size_t = 1) = 0;
+	virtual bool		remove(const T&, size_t = 1) = 0;
+	virtual bool		removeAll(const T&) = 0;
+	virtual BinaryTreeNode<T>* search(const T&) const = 0;
 
 	virtual bool	empty() const = 0;
 	virtual size_t	size() const = 0;
@@ -63,8 +63,8 @@ public:
 	virtual bool	contains(const T&) const = 0;
 	virtual size_t	count(const T&) const = 0;
 
-	virtual int	getMin() const = 0;
-	virtual int	getMax() const = 0;
+	virtual int getMin() const = 0;
+	virtual int getMax() const = 0;
 
 	virtual std::vector<T*>	preorderDFS() const = 0;
 	virtual std::vector<T*>	inorderDFS() const = 0;
