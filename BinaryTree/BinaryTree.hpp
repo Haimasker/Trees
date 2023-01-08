@@ -5,16 +5,16 @@
 template <class T>
 class BinaryTreeNode {
 protected:
-	T				data;
-	size_t			counter;
+	T	data;
+	size_t	counter;
 	BinaryTreeNode*	left;
 	BinaryTreeNode*	right;
 
 public:
 	BinaryTreeNode(T = T(), size_t = 0);			// OK
 	BinaryTreeNode(const BinaryTreeNode&);			// OK
-	BinaryTreeNode(BinaryTreeNode&&);				// OK
-	virtual ~BinaryTreeNode() = 0;					// OK
+	BinaryTreeNode(BinaryTreeNode&&);			// OK
+	virtual ~BinaryTreeNode() = 0;				// OK
 
 	//todo assignment operators
 
@@ -26,8 +26,8 @@ template <class T>
 class BinaryTree {
 protected:
 	BinaryTreeNode<T>*	root;
-	size_t				size_;
-	size_t				capacity_;
+	size_t	size_;
+	size_t	capacity_;
 
 public:
 	BinaryTree(const BinaryTreeNode<T>* = nullptr);	// OK
