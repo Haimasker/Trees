@@ -25,8 +25,8 @@ protected:
 template <class T>
 class BinaryTree {
 protected:
-	BinaryTreeNode<T>*	root;
-	size_t		size_;
+	BinaryTreeNode<T>* root;
+	size_t			size_;
 	size_t		capacity_;
 
 public:
@@ -53,7 +53,7 @@ public:
 
 	virtual void		insert(const T&, size_t = 1) = 0;
 	virtual bool		remove(const T&, size_t = 1) = 0;
-	virtual bool		removeAll(const T&) = 0;
+	virtual bool			removeAll(const T&) = 0;
 	virtual BinaryTreeNode<T>* search(const T&) const = 0;
 
 	virtual bool	empty() const = 0;
