@@ -5,8 +5,8 @@
 template <class T>
 class BinarySearchTreeNode {
 protected:
-	T		data;
-	size_t		counter;
+	T				data;
+	size_t				counter;
 	BinarySearchTreeNode<T>*	left;
 	BinarySearchTreeNode<T>*	right;
 
@@ -19,17 +19,17 @@ public:
 	virtual BinarySearchTreeNode<T>& operator = (const BinarySearchTreeNode<T>&);
 	virtual BinarySearchTreeNode<T>& operator = (BinarySearchTreeNode<T>&&);
 
-	T getData() const;
-	void setData(const T&);
+	T	getData() const;
+	void	setData(const T&);
 
-	size_t getCounter() const;
-	void setCounter(const size_t);
+	size_t	getCounter() const;
+	void	setCounter(const size_t);
 
 	BinarySearchTreeNode<T>* getLeft() const;
-	void setLeft(BinarySearchTreeNode<T>*);
+	void		setLeft(BinarySearchTreeNode<T>*);
 
 	BinarySearchTreeNode<T>* getRight() const;
-	void setRight(BinarySearchTreeNode<T>*);
+	void		setRight(BinarySearchTreeNode<T>*);
 };
 
 
@@ -41,53 +41,53 @@ protected:
 	size_t				capacity_;
 
 public:
-	BinarySearchTree();												// OK
-	BinarySearchTree(const BinarySearchTreeNode<T>*);				//
-	BinarySearchTree(const BinarySearchTree<T>&);					// OK
-	BinarySearchTree(BinarySearchTree<T>&&);						// OK
-	virtual ~BinarySearchTree();									// OK
+	BinarySearchTree();
+	BinarySearchTree(const BinarySearchTreeNode<T>*);
+	BinarySearchTree(const BinarySearchTree<T>&);
+	BinarySearchTree(BinarySearchTree<T>&&);
+	virtual ~BinarySearchTree();
 
-	virtual BinarySearchTree<T>& operator = (const BinarySearchTree<T>&);	// OK
-	virtual BinarySearchTree<T>& operator = (BinarySearchTree<T>&&);		// OK
+	virtual BinarySearchTree<T>& operator = (const BinarySearchTree<T>&);
+	virtual BinarySearchTree<T>& operator = (BinarySearchTree<T>&&);
 
-	virtual BinarySearchTreeNode<T>*	search(const T&, const BinarySearchTreeNode<T>*) const;	// OK
-	virtual BinarySearchTreeNode<T>*	search(const T&) const;									// OK
-	virtual void			insert(const T&, size_t = 1);										// OK
-	virtual size_t			remove(const T&, const BinarySearchTreeNode<T>*, size_t = 1);		// OK
-	virtual size_t			remove(const T&, size_t = 1);										// OK
-	virtual size_t			removeAll(const T&, const BinarySearchTreeNode<T>*);				// OK
-	virtual size_t			removeAll(const T&);												// OK
+	virtual BinarySearchTreeNode<T>*	search(const T&, const BinarySearchTreeNode<T>*) const;
+	virtual BinarySearchTreeNode<T>*	search(const T&) const;
+	virtual void				insert(const T&, size_t = 1);
+	virtual size_t				remove(const T&, const BinarySearchTreeNode<T>*, size_t = 1);
+	virtual size_t				remove(const T&, size_t = 1);
+	virtual size_t				removeAll(const T&, const BinarySearchTreeNode<T>*);
+	virtual size_t				removeAll(const T&);
 
-	virtual BinarySearchTree<T> operator + (const T&) const;	// OK
-	virtual BinarySearchTree<T>& operator += (const T&);		// OK
-	virtual BinarySearchTree<T> operator - (const T&) const;	// OK
-	virtual BinarySearchTree<T>& operator -= (const T&);		// OK
+	virtual BinarySearchTree<T>	operator + (const T&) const;
+	virtual BinarySearchTree<T>&	operator += (const T&);
+	virtual BinarySearchTree<T>	operator - (const T&) const;
+	virtual BinarySearchTree<T>&	operator -= (const T&);
 
-	virtual BinarySearchTree<T> operator + (const BinarySearchTree<T>&) const;	// OK
-	virtual BinarySearchTree<T>& operator += (const BinarySearchTree<T>&);		// OK
-	virtual BinarySearchTree<T> operator - (const BinarySearchTree<T>&) const;	// OK
-	virtual BinarySearchTree<T>& operator -= (const BinarySearchTree<T>&);		// OK
+	virtual BinarySearchTree<T>	operator + (const BinarySearchTree<T>&) const;
+	virtual BinarySearchTree<T>&	operator += (const BinarySearchTree<T>&);
+	virtual BinarySearchTree<T>	operator - (const BinarySearchTree<T>&) const;
+	virtual BinarySearchTree<T>&	operator -= (const BinarySearchTree<T>&);
 
-	virtual void merge(const BinarySearchTree<T>&);		// OK
-	virtual void exclude(const BinarySearchTree<T>&);	// OK
+	virtual void merge(const BinarySearchTree<T>&);
+	virtual void exclude(const BinarySearchTree<T>&);
 
-	virtual bool	empty() const final;								// OK
-	virtual size_t	size() const final;									// OK
-	virtual size_t	capacity() const final;								// OK
-	virtual size_t	height(const BinarySearchTreeNode<T>*) const final;	// OK
-	virtual size_t	height() const final;								// OK
-	virtual bool	contains(const T&) const final;						// OK
-	virtual size_t	count(const T&) const final;						// OK
+	virtual bool	empty() const final;
+	virtual size_t	size() const final;
+	virtual size_t	capacity() const final;
+	virtual size_t	height(const BinarySearchTreeNode<T>*) const final;
+	virtual size_t	height() const final;
+	virtual bool	contains(const T&) const final;
+	virtual size_t	count(const T&) const final;
 
-	virtual BinarySearchTreeNode<T>* getMin(const BinarySearchTreeNode<T>*) const final;	// OK
-	virtual BinarySearchTreeNode<T>* getMin() const final;									// OK
-	virtual BinarySearchTreeNode<T>* getMax(const BinarySearchTreeNode<T>*) const final;	// OK
-	virtual BinarySearchTreeNode<T>* getMax() const final;									// OK
+	virtual BinarySearchTreeNode<T>* getMin(const BinarySearchTreeNode<T>*) const final;
+	virtual BinarySearchTreeNode<T>* getMin() const final;
+	virtual BinarySearchTreeNode<T>* getMax(const BinarySearchTreeNode<T>*) const final;
+	virtual BinarySearchTreeNode<T>* getMax() const final;
 
-	virtual size_t countSize(const BinarySearchTreeNode<T>*) const final;		// OK
-	virtual size_t countSize() const final;										// OK
-	virtual size_t countCapacity(const BinarySearchTreeNode<T>*) const final;	// OK
-	virtual size_t countCapacity() const final;									// OK
+	virtual size_t countSize(const BinarySearchTreeNode<T>*) const final;
+	virtual size_t countSize() const final;
+	virtual size_t countCapacity(const BinarySearchTreeNode<T>*) const final;
+	virtual size_t countCapacity() const final;
 
 	// virtual std::vector<T*>	preorderDFS() const final;
 	// virtual std::vector<T*>	inorderDFS() const final;
@@ -98,8 +98,8 @@ public:
 	// virtual void clear() final;
 
 protected:
-	virtual void insert(const BinarySearchTreeNode<T>*);	// OK
-	virtual void remove(const BinarySearchTreeNode<T>*);	// OK
+	virtual void insert(const BinarySearchTreeNode<T>*);
+	virtual void remove(const BinarySearchTreeNode<T>*);
 
 };
 
