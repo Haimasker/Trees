@@ -1,6 +1,3 @@
-//#include "BinarySearchTree.hpp"
-#include <iostream>
-
 template <class T>
 BinarySearchTreeNode<T>::BinarySearchTreeNode(const T& data, size_t counter)
 	: data(data), counter(counter), left(nullptr), right(nullptr) { }
