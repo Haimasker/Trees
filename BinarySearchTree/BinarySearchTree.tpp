@@ -95,10 +95,6 @@ BinarySearchTree<T>::BinarySearchTree()
 	: root(nullptr), size_(0), capacity_(0) { }
 
 template <class T>
-BinarySearchTree<T>::BinarySearchTree(const BinarySearchTreeNode<T>* node)
-	: root(node), size_(countSize(node)), capacity_(countCapacity(node)) { }
-
-template <class T>
 BinarySearchTree<T>::BinarySearchTree(const BinarySearchTree<T>& tree)
 	: root(tree.root ? new BinarySearchTreeNode<T>(*tree.root) : nullptr),
 	size_(tree.size_), capacity_(tree.capacity_) { }
@@ -111,10 +107,11 @@ BinarySearchTree<T>::BinarySearchTree(BinarySearchTree<T>&& tree)
 
 template <class T>
 BinarySearchTree<T>::~BinarySearchTree() {
-	if (this->root)
+	if (this->root) {
 		delete this->root;
-	this->size_ = this->capacity_ = 0;
-	//this->root = nullptr;
+		this->size_ = this->capacity_ = 0;
+		this->root = nullptr;
+	}
 }
 
 template <class T>
@@ -136,101 +133,129 @@ BinarySearchTree<T>& BinarySearchTree<T>::operator = (BinarySearchTree<T>&& tree
 }
 
 template <class T>
-BinarySearchTreeNode<T>* BinarySearchTree<T>::search(const T& data, const BinarySearchTreeNode<T>* node) const {
-	BinarySearchTreeNode<T>* current = node;
-	while (current) {
-		if (current->data = data)
-			return current;
+BinarySearchTreeNode<T>* BinarySearchTree<T>::search(const T& data) const {
+	BinarySearchTreeNode<T>* current = this->root;
+	while (current && current->data != data)
 		current = (data < current->data) ? current->left : current->right;
-	}
 	return current;
 }
 
 template <class T>
-BinarySearchTreeNode<T>* BinarySearchTree<T>::search(const T& data) const {
-	return this->search(data, this->root);
-}
-
-template <class T>
 void BinarySearchTree<T>::insert(const T& data, size_t counter) {
-	BinarySearchTreeNode<T>* current = this->search(data);
-	this->size_ += counter;
-	if (current)
-		current->counter += counter;
-	else {
-		this->capacity_++;
-		current = new BinarySearchTreeNode<T>(data, counter);
+	if (!this->root) {
+		this->root = new BinarySearchTreeNode<T>(data, counter);
+		this->size_ = counter;
+		this->capacity_ = 1;
+		return;
+	}
+	BinarySearchTreeNode<T>* current = root;
+	while (current) {
+		if (data < current->data) {
+			if (current->left)
+				current = current->left;
+			else {
+				current->left = new BinarySearchTreeNode<T>(data, counter);
+				this->size_ += counter;
+				this->capacity_++;
+				break;
+			}
+		}
+		else if (data > current->data) {
+			if (current->right)
+				current = current->right;
+			else {
+				current->right = new BinarySearchTreeNode<T>(data, counter);
+				this->size_ += counter;
+				this->capacity_++;
+				break;
+			}
+		}
+		else {
+			current->counter += counter;
+			this->size_ += counter;
+			break;
+		}
 	}
 	return;
 }
 
 template <class T>
-size_t BinarySearchTree<T>::remove(const T& data, const BinarySearchTreeNode<T>* node, size_t counter) {
-	BinarySearchTreeNode<T>* current = this->search(data, node);
-	if (!current)
-		return 0;
-
-	size_t deletedCount = std::min(current->counter, counter);
-	this->size_ -= deletedCount;
-	this->capacity_ -= (counter >= current->counter) ? 1 : 0;
-
-	if (counter < current->counter)
-		current->counter -= counter;
-	else {
-		if (!current->left && !current->right)
-			delete current;
-		else if(!current->left)
-			current = current->right;
-		else if(!current->right)
-			current = current->left;
-		else {
-			BinarySearchTreeNode<T>* tmpNode = getMin(current->right);
-			current->data = tmpNode->data;
-			current->counter = tmpNode->counter;
-			this->removeAll(tmpNode->data, current->right);
-		}
-	}
-	return deletedCount;
-}
-
-template <class T>
 size_t BinarySearchTree<T>::remove(const T& data, size_t counter) {
-	return this->remove(data, this->root, counter);
-}
-
-template <class T>
-size_t BinarySearchTree<T>::removeAll(const T& data, const BinarySearchTreeNode<T>* node) {
-	BinarySearchTreeNode<T>* current = this->search(data, node);
-	if (!current)
+	if (!this->root)
 		return 0;
 
-	size_t deletedCount = current->counter;
-	this->size_ -= deletedCount;
-	this->capacity_--;
+	BinarySearchTreeNode<T>* toDelete = this->search(data);
+	if (!toDelete)
+		return 0;
 
-	if (!current->left && !current->right)
-		delete current;
-	else if(!current->left)
-		current = current->right;
-	else if(!current->right)
-		current = current->left;
-	else {
-		BinarySearchTreeNode<T>* tmpNode = getMin(current->right);
-		current->data = tmpNode->data;
-		current->counter = tmpNode->counter;
-		this->removeAll(tmpNode->data, current->right);
-	}
+	size_t deletedCount = std::min(toDelete->counter, counter);
+
+	if (counter >= toDelete->counter)
+		return this->removeAll(data);
+	toDelete->counter -= counter;
+	this->size_ -= deletedCount;
 	return deletedCount;
 }
 
 template <class T>
 size_t BinarySearchTree<T>::removeAll(const T& data) {
-	return this->removeAll(data, this->root);
+	if (!this->root)
+		return 0;
+
+	BinarySearchTreeNode<T>* previous = findPreviousNode(data);
+	if (!previous && data != this->root->data)
+		return 0;
+
+	BinarySearchTreeNode<T>* toDelete = this->root;
+	if (previous && previous->left && previous->left->data == data)
+		toDelete = previous->left;
+	else if (previous && previous->right && previous->right->data == data)
+		toDelete = previous->right;
+
+	size_t deletedCount = toDelete->counter;
+
+	if (toDelete->left && toDelete->right) {
+		BinarySearchTreeNode<T>* tmpNode = getMin(toDelete->right);
+		T tmpData = tmpNode->data;
+		size_t tmpCounter = tmpNode->counter;
+		size_t tmpDeleted = this->removeAll(tmpNode->data);
+		toDelete->data = tmpData;
+		toDelete->counter = tmpCounter;
+		this->size_ = this->size_ - deletedCount + tmpDeleted;
+		return deletedCount;
+	}
+	else if (!toDelete->left && !toDelete->right) {
+		if (!previous) {
+			this->clear();
+			return deletedCount;
+		}
+		((previous->left == toDelete) ? previous->left : previous->right) = nullptr;
+	}
+	else if (!toDelete->left) {
+		BinarySearchTreeNode<T>* tmpNode = toDelete->right;
+		toDelete->right = nullptr;
+		if (!previous)
+			this->root = std::move(tmpNode);
+		else
+			((previous->left == toDelete) ? previous->left : previous->right) = std::move(tmpNode);
+	}
+	else {
+		BinarySearchTreeNode<T>* tmpNode = toDelete->left;
+		toDelete->left = nullptr;
+		if (!previous)
+			this->root = std::move(tmpNode);
+		else
+			((previous->left == toDelete) ? previous->left : previous->right) = std::move(tmpNode);
+	}
+	delete toDelete;
+	this->size_ -= deletedCount;
+	this->capacity_--;
+	return deletedCount;
 }
 
 template <class T>
 BinarySearchTree<T> BinarySearchTree<T>::operator + (const T& data) const {
-	BinarySearchTree<T> result = this;
+	BinarySearchTree<T> result = *this;
 	result.insert(data);
 	return result;
 }
@@ -243,7 +268,7 @@ BinarySearchTree<T>& BinarySearchTree<T>::operator += (const T& data) {
 
 template <class T>
 BinarySearchTree<T> BinarySearchTree<T>::operator - (const T& data) const {
-	BinarySearchTree<T> result = this;
+	BinarySearchTree<T> result = *this;
 	result.remove(data);
 	return result;
 }
@@ -256,7 +281,7 @@ BinarySearchTree<T>& BinarySearchTree<T>::operator -= (const T& data) {
 
 template <class T>
 BinarySearchTree<T> BinarySearchTree<T>::operator + (const BinarySearchTree<T>& tree) const {
-	BinarySearchTree<T> result = this;
+	BinarySearchTree<T> result = *this;
 	result.insert(tree.root);
 	return result;
 }
@@ -269,7 +294,7 @@ BinarySearchTree<T>& BinarySearchTree<T>::operator += (const BinarySearchTree<T>
 
 template <class T>
 BinarySearchTree<T> BinarySearchTree<T>::operator - (const BinarySearchTree<T>& tree) const {
-	BinarySearchTree<T> result = this;
+	BinarySearchTree<T> result = *this;
 	result.remove(tree.root);
 	return result;
 }
@@ -282,13 +307,13 @@ BinarySearchTree<T>& BinarySearchTree<T>::operator -= (const BinarySearchTree<T>
 
 template <class T>
 void BinarySearchTree<T>::merge(const BinarySearchTree<T>& tree) {
-	this += tree;
+	*this += tree;
 	return;
 }
 
 template <class T>
 void BinarySearchTree<T>::exclude(const BinarySearchTree<T>& tree) {
-	this -= tree;
+	*this -= tree;
 	return;
 }
 
@@ -308,7 +333,7 @@ size_t BinarySearchTree<T>::capacity() const {
 }
 
 template <class T>
-size_t BinarySearchTree<T>::height(const BinarySearchTreeNode<T>* node) const {
+size_t BinarySearchTree<T>::height(BinarySearchTreeNode<T>* const node) const {
 	return (!node) ? 0 : std::max(this->height(node->left), this->height(node->right)) + 1;
 }
 
@@ -328,30 +353,9 @@ size_t BinarySearchTree<T>::count(const T& data) const {
 	return (node) ? node->counter : 0;
 }
 
-
-
-
-
-
-template <class T>
-BinarySearchTreeNode<T>* BinarySearchTree<T>::getMin(const BinarySearchTreeNode<T>* node) const {
-	BinarySearchTreeNode<T>* current = node;
-	while (current->left)
-		current = current->left;
-	return current;
-}
-
 template <class T>
 BinarySearchTreeNode<T>* BinarySearchTree<T>::getMin() const {
 	return this->getMin(this->root);
-}
-
-template <class T>
-BinarySearchTreeNode<T>* BinarySearchTree<T>::getMax(const BinarySearchTreeNode<T>* node) const {
-	BinarySearchTreeNode<T>* current = node;
-	while (current->right)
-		current = current->right;
-	return current;
 }
 
 template <class T>
@@ -360,37 +364,89 @@ BinarySearchTreeNode<T>* BinarySearchTree<T>::getMax() const {
 }
 
 template <class T>
-size_t BinarySearchTree<T>::countSize(const BinarySearchTreeNode<T>* node) const {
-	if (!node)
-		return 0;
-	return node->counter + countSize(node->left) + countSize(node->right);
+std::vector<BinarySearchTreeNode<T>*> BinarySearchTree<T>::preorderDFS() const {
+	std::vector<BinarySearchTreeNode<T>*> result;
+	this->preorderDFS(this->root, result);
+	return result;
 }
 
 template <class T>
-size_t BinarySearchTree<T>::countSize() const {
-	return this->countSize(this->root);
+std::vector<BinarySearchTreeNode<T>*> BinarySearchTree<T>::inorderDFS() const {
+	std::vector<BinarySearchTreeNode<T>*> result;
+	this->inorderDFS(this->root, result);
+	return result;
 }
 
 template <class T>
-size_t BinarySearchTree<T>::countCapacity(const BinarySearchTreeNode<T>* node) const {
-	if (!node)
-		return 0;
-	return 1 + countCapacity(node->left) + countCapacity(node->right);
+std::vector<BinarySearchTreeNode<T>*> BinarySearchTree<T>::postorderDFS() const {
+	std::vector<BinarySearchTreeNode<T>*> result;
+	this->postorderDFS(this->root, result);
+	return result;
 }
 
 template <class T>
-size_t BinarySearchTree<T>::countCapacity() const {
-	return this->countCapacity(this->root);
+std::vector<BinarySearchTreeNode<T>*> BinarySearchTree<T>::leftBFS() const {
+	std::vector<BinarySearchTreeNode<T>*> result;
+	if (!this->root)
+		return result;
+	std::queue<BinarySearchTreeNode<T>*> q;
+	q.push(this->root);
+	while (!q.empty()) {
+		BinarySearchTreeNode<T>* tmpNode = q.front();
+		q.pop();
+		result.push_back(tmpNode);
+		if (tmpNode->left)
+			q.push(tmpNode->left);
+		if (tmpNode->right)
+			q.push(tmpNode->right);
+	}
+	return result;
 }
 
+template <class T>
+std::vector<BinarySearchTreeNode<T>*> BinarySearchTree<T>::rightBFS() const {
+	std::vector<BinarySearchTreeNode<T>*> result;
+	if (!this->root)
+		return result;
+	std::queue<BinarySearchTreeNode<T>*> q;
+	q.push(this->root);
+	while (!q.empty()) {
+		BinarySearchTreeNode<T>* tmpNode = q.front();
+		q.pop();
+		result.push_back(tmpNode);
+		if (tmpNode->right)
+			q.push(tmpNode->right);
+		if (tmpNode->left)
+			q.push(tmpNode->left);
+	}
+	return result;
+}
 
+template <class T>
+BinarySearchTreeNode<T>* BinarySearchTree<T>::getRoot() const {
+	return this->root;
+}
 
+template <class T>
+void BinarySearchTree<T>::clear() {
+	this->~BinarySearchTree<T>();
+}
 
+template <class T>
+BinarySearchTreeNode<T>* BinarySearchTree<T>::findPreviousNode(const T& data) const {
+	BinarySearchTreeNode<T>* current = this->root;
+	while (current) {
+		if ((current->left && current->left->data == data) || (current->right && current->right->data == data))
+			break;
+		current = (data < current->data) ? current->left : current->right;
+	}
+	return current;
+}
 
 template <class T>
 void BinarySearchTree<T>::insert(const BinarySearchTreeNode<T>* node) {
 	if (node) {
-		this += node->data;
+		this->insert(node->data, node->counter);
 		this->insert(node->left);
 		this->insert(node->right);
 	}
@@ -400,9 +456,59 @@ void BinarySearchTree<T>::insert(const BinarySearchTreeNode<T>* node) {
 template <class T>
 void BinarySearchTree<T>::remove(const BinarySearchTreeNode<T>* node) {
 	if (node) {
-		this -= node->data;
+		this->remove(node->data, node->counter);
 		this->remove(node->left);
 		this->remove(node->right);
 	}
+	return;
+}
+
+template <class T>
+BinarySearchTreeNode<T>* BinarySearchTree<T>::getMin(BinarySearchTreeNode<T>* const node) const {
+	if (!node)
+		return nullptr;
+	BinarySearchTreeNode<T>* current = node;
+	while (current->left)
+		current = current->left;
+	return current;
+}
+
+template <class T>
+BinarySearchTreeNode<T>* BinarySearchTree<T>::getMax(BinarySearchTreeNode<T>* const node) const {
+	if (!node)
+		return nullptr;
+	BinarySearchTreeNode<T>* current = node;
+	while (current->right)
+		current = current->right;
+	return current;
+}
+
+template <class T>
+void BinarySearchTree<T>::preorderDFS(BinarySearchTreeNode<T>* const node, std::vector<BinarySearchTreeNode<T>*>& result) const {
+	if (!node)
+		return;
+	result.push_back(node);
+	preorderDFS(node->left, result);
+	preorderDFS(node->right, result);
+	return;
+}
+
+template <class T>
+void BinarySearchTree<T>::inorderDFS(BinarySearchTreeNode<T>* const node, std::vector<BinarySearchTreeNode<T>*>& result) const {
+	if (!node)
+		return;
+	inorderDFS(node->left, result);
+	result.push_back(node);
+	inorderDFS(node->right, result);
+	return;
+}
+
+template <class T>
+void BinarySearchTree<T>::postorderDFS(BinarySearchTreeNode<T>* const node, std::vector<BinarySearchTreeNode<T>*>& result) const {
+	if (!node)
+		return;
+	postorderDFS(node->left, result);
+	postorderDFS(node->right, result);
+	result.push_back(node);
 	return;
 }
