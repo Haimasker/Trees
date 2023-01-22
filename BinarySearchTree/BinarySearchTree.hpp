@@ -6,7 +6,8 @@
 
 template <class T>
 class BinarySearchTreeNode {
-	template <class U> friend class BinarySearchTree;
+	template <class T1> friend class BinarySearchTree;
+	template <class N1> friend class AVLTreeNode;
 
 protected:
 	T				data;
@@ -29,11 +30,15 @@ public:
 	size_t	getCounter() const;
 	void	setCounter(const size_t);
 
-	BinarySearchTreeNode<T>* getLeft() const;
-	void			setLeft(BinarySearchTreeNode<T>*);
+	virtual BinarySearchTreeNode<T>* getLeft() const;
+	virtual void		setLeft(BinarySearchTreeNode<T>*);
 
-	BinarySearchTreeNode<T>* getRight() const;
-	void			setRight(BinarySearchTreeNode<T>*);
+	virtual BinarySearchTreeNode<T>* getRight() const;
+	virtual void		setRight(BinarySearchTreeNode<T>*);
+
+protected:
+	virtual void copy(const BinarySearchTreeNode<T>&);
+	virtual void move(BinarySearchTreeNode<T>&&);
 };
 
 
