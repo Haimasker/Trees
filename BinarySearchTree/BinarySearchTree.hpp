@@ -37,10 +37,10 @@ public:
 	virtual void	setCounter(const size_t) final;
 
 	virtual BinarySearchTreeNode<T>*	getLeft() const;
-	virtual void			setLeft(BinarySearchTreeNode<T>*) final;
+	virtual void				setLeft(BinarySearchTreeNode<T>*) final;
 
 	virtual BinarySearchTreeNode<T>*	getRight() const;
-	virtual void			setRight(BinarySearchTreeNode<T>*) final;
+	virtual void				setRight(BinarySearchTreeNode<T>*) final;
 
 protected:
 	virtual void copy(const BinarySearchTreeNode<T>&);
