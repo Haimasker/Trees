@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <utility>
 #include <vector>
 #include <queue>
@@ -7,7 +8,9 @@
 template <class T>
 class BinarySearchTreeNode {
 	template <class T1> friend class BinarySearchTree;
-	template <class N1> friend class AVLTreeNode;
+
+	template <class T2> friend class AVLTree;
+	template <class N2> friend class AVLTreeNode;
 
 protected:
 	T				data;
@@ -24,26 +27,33 @@ public:
 	virtual BinarySearchTreeNode<T>& operator = (const BinarySearchTreeNode<T>&);
 	virtual BinarySearchTreeNode<T>& operator = (BinarySearchTreeNode<T>&&);
 
-	T	getData() const;
-	void	setData(const T&);
+	virtual bool operator == (const BinarySearchTreeNode<T>&) const final;
+	virtual bool operator != (const BinarySearchTreeNode<T>&) const final;
 
-	size_t	getCounter() const;
-	void	setCounter(const size_t);
+	virtual T	getData() const final;
+	virtual void	setData(const T&) final;
+
+	virtual size_t	getCounter() const final;
+	virtual void	setCounter(const size_t) final;
 
 	virtual BinarySearchTreeNode<T>* getLeft() const;
-	virtual void		setLeft(BinarySearchTreeNode<T>*);
+	virtual void		setLeft(BinarySearchTreeNode<T>*) final;
 
 	virtual BinarySearchTreeNode<T>* getRight() const;
-	virtual void		setRight(BinarySearchTreeNode<T>*);
+	virtual void		setRight(BinarySearchTreeNode<T>*) final;
 
 protected:
 	virtual void copy(const BinarySearchTreeNode<T>&);
 	virtual void move(BinarySearchTreeNode<T>&&);
+
+	virtual bool isEqual(const BinarySearchTreeNode<T>*, const BinarySearchTreeNode<T>*) const;
 };
 
 
 template <class T>
 class BinarySearchTree {
+	template <class T1> friend class AVLTree;
+
 protected:
 	BinarySearchTreeNode<T>*	root;
 	size_t				size_;
@@ -58,42 +68,47 @@ public:
 	virtual BinarySearchTree<T>& operator = (const BinarySearchTree<T>&);
 	virtual BinarySearchTree<T>& operator = (BinarySearchTree<T>&&);
 
+	virtual bool operator == (const BinarySearchTree<T>&) const final;
+	virtual bool operator != (const BinarySearchTree<T>&) const final;
+
 	virtual BinarySearchTreeNode<T>*	search(const T&) const;
 	virtual void				insert(const T&, size_t = 1);
-	virtual size_t				remove(const T&, size_t = 1);
+	virtual size_t				remove(const T&, size_t = 1) final;
 	virtual size_t				removeAll(const T&);
 
-	virtual BinarySearchTree<T>	operator + (const T&) const;
-	virtual BinarySearchTree<T>&	operator += (const T&);
-	virtual BinarySearchTree<T>	operator - (const T&) const;
-	virtual BinarySearchTree<T>&	operator -= (const T&);
+	BinarySearchTree<T> operator + (const T&) const;
+	BinarySearchTree<T> operator - (const T&) const;
 
-	virtual BinarySearchTree<T>	operator + (const BinarySearchTree<T>&) const;
-	virtual BinarySearchTree<T>&	operator += (const BinarySearchTree<T>&);
-	virtual BinarySearchTree<T>	operator - (const BinarySearchTree<T>&) const;
-	virtual BinarySearchTree<T>&	operator -= (const BinarySearchTree<T>&);
+	virtual BinarySearchTree<T>& operator += (const T&);
+	virtual BinarySearchTree<T>& operator -= (const T&);
 
-	virtual void merge(const BinarySearchTree<T>&);
-	virtual void exclude(const BinarySearchTree<T>&);
+	BinarySearchTree<T> operator + (const BinarySearchTree<T>&) const;
+	BinarySearchTree<T> operator - (const BinarySearchTree<T>&) const;
+
+	virtual BinarySearchTree<T>& operator += (const BinarySearchTree<T>&);
+	virtual BinarySearchTree<T>& operator -= (const BinarySearchTree<T>&);
+
+	virtual void merge(const BinarySearchTree<T>&) final;
+	virtual void exclude(const BinarySearchTree<T>&) final;
 
 	virtual bool	empty() const final;
 	virtual size_t	size() const final;
 	virtual size_t	capacity() const final;
-	virtual size_t	height(BinarySearchTreeNode<T>* const) const final;
-	virtual size_t	height() const final;
+	virtual size_t	height(BinarySearchTreeNode<T>* const) const;
+	virtual size_t	height() const;
 	virtual bool	contains(const T&) const final;
 	virtual size_t	count(const T&) const final;
 
-	virtual BinarySearchTreeNode<T>* getMin() const final;
-	virtual BinarySearchTreeNode<T>* getMax() const final;
+	virtual BinarySearchTreeNode<T>* getMin() const;
+	virtual BinarySearchTreeNode<T>* getMax() const;
 
-	virtual std::vector<BinarySearchTreeNode<T>*> preorderDFS() const final;
-	virtual std::vector<BinarySearchTreeNode<T>*> inorderDFS() const final;
-	virtual std::vector<BinarySearchTreeNode<T>*> postorderDFS() const final;
-	virtual std::vector<BinarySearchTreeNode<T>*> leftBFS() const final;
-	virtual std::vector<BinarySearchTreeNode<T>*> rightBFS() const final;
+	std::vector<BinarySearchTreeNode<T>*> preorderDFS() const;
+	std::vector<BinarySearchTreeNode<T>*> inorderDFS() const;
+	std::vector<BinarySearchTreeNode<T>*> postorderDFS() const;
+	std::vector<BinarySearchTreeNode<T>*> leftBFS() const;
+	std::vector<BinarySearchTreeNode<T>*> rightBFS() const;
 
-	virtual BinarySearchTreeNode<T>* getRoot() const final;
+	virtual BinarySearchTreeNode<T>* getRoot() const;
 
 	virtual void clear() final;
 
@@ -103,13 +118,12 @@ protected:
 	virtual void insert(const BinarySearchTreeNode<T>*) final;
 	virtual void remove(const BinarySearchTreeNode<T>*) final;
 
-	virtual BinarySearchTreeNode<T>* getMin(BinarySearchTreeNode<T>* const) const final;
-	virtual BinarySearchTreeNode<T>* getMax(BinarySearchTreeNode<T>* const) const final;
+	virtual BinarySearchTreeNode<T>* getMin(BinarySearchTreeNode<T>* const) const;
+	virtual BinarySearchTreeNode<T>* getMax(BinarySearchTreeNode<T>* const) const;
 
 	virtual void preorderDFS(BinarySearchTreeNode<T>* const, std::vector<BinarySearchTreeNode<T>*>&) const final;
 	virtual void inorderDFS(BinarySearchTreeNode<T>* const, std::vector<BinarySearchTreeNode<T>*>&) const final;
 	virtual void postorderDFS(BinarySearchTreeNode<T>* const, std::vector<BinarySearchTreeNode<T>*>&) const final;
-
 };
 
 
