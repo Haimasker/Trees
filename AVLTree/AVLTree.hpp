@@ -54,8 +54,8 @@ public:
 	virtual AVLTree<T>& operator = (AVLTree<T>&&);
 
 	virtual AVLTreeNode<T>*	search(const T&) const override;
-	virtual void			insert(const T&, size_t = 1) override;
-	virtual size_t			removeAll(const T&) override;
+	virtual void		insert(const T&, size_t = 1) override;
+	virtual size_t		removeAll(const T&) override;
 
 	AVLTree<T> operator + (const T&) const;
 	AVLTree<T> operator - (const T&) const;
