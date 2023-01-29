@@ -113,8 +113,6 @@ public:
 	virtual void clear() final;
 
 protected:
-	virtual BinarySearchTreeNode<T>* findPreviousNode(const T&) const final;
-
 	virtual void insert(const BinarySearchTreeNode<T>*) final;
 	virtual void remove(const BinarySearchTreeNode<T>*) final;
 
