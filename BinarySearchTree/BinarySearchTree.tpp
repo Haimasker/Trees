@@ -239,52 +239,34 @@ template <class T>
 size_t BinarySearchTree<T>::removeAll(const T& data) {
 	if (!this->root)
 		return 0;
-	BinarySearchTreeNode<T>* previous = findPreviousNode(data);
-	if (!previous && data != this->root->data)
+	BinarySearchTreeNode<T>** toDelete = &(this->root);
+
+	while (*toDelete && (*toDelete)->data != data)
+		toDelete = (data < (*toDelete)->data) ? &((*toDelete)->left) : &((*toDelete)->right);
+	if (!(*toDelete))
 		return 0;
+	size_t deletedCount = (*toDelete)->counter;
 
-	BinarySearchTreeNode<T>* toDelete = this->root;
-	if (previous && previous->left && previous->left->data == data)
-		toDelete = previous->left;
-	else if (previous && previous->right && previous->right->data == data)
-		toDelete = previous->right;
-
-	size_t deletedCount = toDelete->counter;
-
-	if (toDelete->left && toDelete->right) {
-		BinarySearchTreeNode<T>* successor = getMin(toDelete->right);
+	if ((*toDelete)->left && (*toDelete)->right) {
+		BinarySearchTreeNode<T>* successor = getMin((*toDelete)->right);
 		T tmpData = successor->data;
 		size_t tmpCounter = successor->counter;
-		size_t tmpDeleted = this->removeAll(successor->data);
-		toDelete->data = tmpData;
-		toDelete->counter = tmpCounter;
+		size_t tmpDeleted = removeAll(successor->data);
+		(*toDelete)->data = tmpData;
+		(*toDelete)->counter = tmpCounter;
 		this->size_ = this->size_ - deletedCount + tmpDeleted;
 		return deletedCount;
 	}
-	else if (!toDelete->left && !toDelete->right) {
-		if (!previous) {
-			this->clear();
-			return deletedCount;
-		}
-		((previous->left == toDelete) ? previous->left : previous->right) = nullptr;
-	}
-	else if (!toDelete->left) {
-		BinarySearchTreeNode<T>* tmpNode = toDelete->right;
-		toDelete->right = nullptr;
-		if (!previous)
-			this->root = std::move(tmpNode);
-		else
-			((previous->left == toDelete) ? previous->left : previous->right) = std::move(tmpNode);
+	else if (!(*toDelete)->left && !(*toDelete)->right) {
+		delete *toDelete;
+		*toDelete = nullptr;
 	}
 	else {
-		BinarySearchTreeNode<T>* tmpNode = toDelete->left;
-		toDelete->left = nullptr;
-		if (!previous)
-			this->root = std::move(tmpNode);
-		else
-			((previous->left == toDelete) ? previous->left : previous->right) = std::move(tmpNode);
+		BinarySearchTreeNode<T>* tmpNode = (!(*toDelete)->left) ? (*toDelete)->right : (*toDelete)->left;
+		((!(*toDelete)->left) ? (*toDelete)->right : (*toDelete)->left) = nullptr;
+		delete *toDelete;
+		*toDelete = std::move(tmpNode);
 	}
-	delete toDelete;
 	this->size_ -= deletedCount;
 	this->capacity_--;
 	return deletedCount;
@@ -467,17 +449,6 @@ BinarySearchTreeNode<T>* BinarySearchTree<T>::getRoot() const {
 template <class T>
 void BinarySearchTree<T>::clear() {
 	this->~BinarySearchTree();
-}
-
-template <class T>
-BinarySearchTreeNode<T>* BinarySearchTree<T>::findPreviousNode(const T& data) const {
-	BinarySearchTreeNode<T>* current = this->root;
-	while (current) {
-		if ((current->left && current->left->data == data) || (current->right && current->right->data == data))
-			break;
-		current = (data < current->data) ? current->left : current->right;
-	}
-	return current;
 }
 
 template <class T>
