@@ -3,13 +3,21 @@ BinarySearchTreeNode<T>::BinarySearchTreeNode(const T& data, size_t counter)
 	: data(data), counter(counter), left(nullptr), right(nullptr) { }
 
 template <class T>
-BinarySearchTreeNode<T>::BinarySearchTreeNode(const BinarySearchTreeNode<T>& node) {
-	this->copy(node);
+BinarySearchTreeNode<T>::BinarySearchTreeNode(const BinarySearchTreeNode<T>& node)
+	: BinarySearchTreeNode<T>() {
+	if (typeid(*this) == typeid(node)) {
+		this->~BinarySearchTreeNode();
+		this->copy(node);
+	}
 }
 
 template<class T>
-BinarySearchTreeNode<T>::BinarySearchTreeNode(BinarySearchTreeNode<T>&& node) {
-	this->move(std::move(node));
+BinarySearchTreeNode<T>::BinarySearchTreeNode(BinarySearchTreeNode<T>&& node)
+	: BinarySearchTreeNode<T>() {
+	if (typeid(*this) == typeid(node)) {
+		this->~BinarySearchTreeNode();
+		this->move(std::move(node));
+	}
 }
 
 template <class T>
@@ -23,7 +31,7 @@ BinarySearchTreeNode<T>::~BinarySearchTreeNode() {
 
 template <class T>
 BinarySearchTreeNode<T>& BinarySearchTreeNode<T>::operator = (const BinarySearchTreeNode<T>& node) {
-	if (this != &node) {
+	if (typeid(*this) == typeid(node) && this != &node) {
 		this->~BinarySearchTreeNode();
 		new(this) BinarySearchTreeNode<T>(node);
 	}
@@ -32,7 +40,7 @@ BinarySearchTreeNode<T>& BinarySearchTreeNode<T>::operator = (const BinarySearch
 
 template <class T>
 BinarySearchTreeNode<T>& BinarySearchTreeNode<T>::operator = (BinarySearchTreeNode<T>&& node) {
-	if (this != &node) {
+	if (typeid(*this) == typeid(node) && this != &node) {
 		this->~BinarySearchTreeNode();
 		new(this) BinarySearchTreeNode<T>(std::move(node));
 	}
@@ -77,9 +85,11 @@ BinarySearchTreeNode<T>* BinarySearchTreeNode<T>::getLeft() const {
 }
 
 template <class T>
-void BinarySearchTreeNode<T>::setLeft(BinarySearchTreeNode<T>* node) {
+bool BinarySearchTreeNode<T>::setLeft(BinarySearchTreeNode<T>* node) {
+	if (typeid(*this) != typeid(*node))
+		return false;
 	this->left = node;
-	return;
+	return true;
 }
 
 template <class T>
@@ -88,9 +98,11 @@ BinarySearchTreeNode<T>* BinarySearchTreeNode<T>::getRight() const {
 }
 
 template <class T>
-void BinarySearchTreeNode<T>::setRight(BinarySearchTreeNode<T>* node) {
+bool BinarySearchTreeNode<T>::setRight(BinarySearchTreeNode<T>* node) {
+	if (typeid(*this) != typeid(*node))
+		return false;
 	this->right = node;
-	return;
+	return true;
 }
 
 template <class T>
@@ -130,14 +142,25 @@ BinarySearchTree<T>::BinarySearchTree()
 
 template <class T>
 BinarySearchTree<T>::BinarySearchTree(const BinarySearchTree<T>& tree)
-	: root(tree.root ? new BinarySearchTreeNode<T>(*tree.root) : nullptr),
-	size_(tree.size_), capacity_(tree.capacity_) { }
+	: BinarySearchTree<T>() {
+	if (typeid(*this) == typeid(tree)) {
+		this->~BinarySearchTree();
+		this->root = tree.root ? new BinarySearchTreeNode<T>(*tree.root) : nullptr;
+		this->size_ = tree.size_;
+		this->capacity_ = tree.capacity_;
+	}
+}
 
 template <class T>
 BinarySearchTree<T>::BinarySearchTree(BinarySearchTree<T>&& tree)
-	: root(std::exchange(tree.root, nullptr)),
-	size_(std::exchange(tree.size_, 0)),
-	capacity_(std::exchange(tree.capacity_, 0)) { }
+	: BinarySearchTree<T>() {
+	if (typeid(*this) == typeid(tree)) {
+		this->~BinarySearchTree();
+		this->root = std::exchange(tree.root, nullptr);
+		this->size_ = std::exchange(tree.size_, 0);
+		this->capacity_ = std::exchange(tree.capacity_, 0);
+	}
+}
 
 template <class T>
 BinarySearchTree<T>::~BinarySearchTree() {
@@ -150,7 +173,7 @@ BinarySearchTree<T>::~BinarySearchTree() {
 
 template <class T>
 BinarySearchTree<T>& BinarySearchTree<T>::operator = (const BinarySearchTree<T>& tree) {
-	if (this != &tree) {
+	if (typeid(*this) == typeid(tree) && this != &tree) {
 		this->~BinarySearchTree();
 		new(this) BinarySearchTree<T>(tree);
 	}
@@ -159,7 +182,7 @@ BinarySearchTree<T>& BinarySearchTree<T>::operator = (const BinarySearchTree<T>&
 
 template <class T>
 BinarySearchTree<T>& BinarySearchTree<T>::operator = (BinarySearchTree<T>&& tree) {
-	if (this != &tree) {
+	if (typeid(*this) == typeid(tree) && this != &tree) {
 		this->~BinarySearchTree();
 		new(this) BinarySearchTree<T>(std::move(tree));
 	}
@@ -301,26 +324,30 @@ BinarySearchTree<T>& BinarySearchTree<T>::operator -= (const T& data) {
 template <class T>
 BinarySearchTree<T> BinarySearchTree<T>::operator + (const BinarySearchTree<T>& tree) const {
 	BinarySearchTree<T> result = *this;
-	result.insert(tree.root);
+	if (typeid(*this) == typeid(tree))
+		result.insert(tree.root);
 	return result;
 }
 
 template <class T>
 BinarySearchTree<T> BinarySearchTree<T>::operator - (const BinarySearchTree<T>& tree) const {
 	BinarySearchTree<T> result = *this;
-	result.remove(tree.root);
+	if (typeid(*this) == typeid(tree))
+		result.remove(tree.root);
 	return result;
 }
 
 template <class T>
 BinarySearchTree<T>& BinarySearchTree<T>::operator += (const BinarySearchTree<T>& tree) {
-	this->insert(tree.root);
+	if (typeid(*this) == typeid(tree))
+		this->insert(tree.root);
 	return *this;
 }
 
 template <class T>
 BinarySearchTree<T>& BinarySearchTree<T>::operator -= (const BinarySearchTree<T>& tree) {
-	this->remove(tree.root);
+	if (typeid(*this) == typeid(tree))
+		this->remove(tree.root);
 	return *this;
 }
 
