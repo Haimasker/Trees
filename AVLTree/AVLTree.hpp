@@ -60,14 +60,8 @@ public:
 	AVLTree<T> operator + (const T&) const;
 	AVLTree<T> operator - (const T&) const;
 
-	virtual AVLTree<T>& operator += (const T&) override;
-	virtual AVLTree<T>& operator -= (const T&) override;
-
 	AVLTree<T> operator + (const BinarySearchTree<T>&) const;
 	AVLTree<T> operator - (const BinarySearchTree<T>&) const;
-
-	virtual AVLTree<T>& operator += (const BinarySearchTree<T>&) override;
-	virtual AVLTree<T>& operator -= (const BinarySearchTree<T>&) override;
 
 	virtual size_t	height(BinarySearchTreeNode<T>* const) const override;
 	virtual size_t	height() const override;
