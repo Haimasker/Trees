@@ -4,11 +4,21 @@ AVLTreeNode<T>::AVLTreeNode(const T& data, size_t counter, size_t height)
 
 template <class T>
 AVLTreeNode<T>::AVLTreeNode(const BinarySearchTreeNode<T>& node)
-	: AVLTreeNode<T>(*dynamic_cast<const AVLTreeNode<T>*>(&node)) { }
+	: BinarySearchTreeNode<T>() {
+	if (typeid(*this) == typeid(node)) {
+		this->~AVLTreeNode();
+		new(this) AVLTreeNode<T>(*dynamic_cast<const AVLTreeNode<T>*>(&node));
+	}
+}
 
 template<class T>
 AVLTreeNode<T>::AVLTreeNode(BinarySearchTreeNode<T>&& node)
-	: AVLTreeNode<T>(std::move(*dynamic_cast<const AVLTreeNode<T>*>(&node))) { }
+	: BinarySearchTreeNode<T>() {
+	if (typeid(*this) == typeid(node)) {
+		this->~AVLTreeNode();
+		new(this) AVLTreeNode<T>(std::move(*dynamic_cast<AVLTreeNode<T>*>(&node)));
+	}
+}
 
 template <class T>
 AVLTreeNode<T>::AVLTreeNode(const AVLTreeNode<T>& node)
@@ -23,13 +33,11 @@ AVLTreeNode<T>::AVLTreeNode(AVLTreeNode<T>&& node)
 }
 
 template <class T>
-AVLTreeNode<T>::~AVLTreeNode() {
-	this->height = 0;
-}
+AVLTreeNode<T>::~AVLTreeNode() { }
 
 template <class T>
 AVLTreeNode<T>& AVLTreeNode<T>::operator = (const BinarySearchTreeNode<T>& node) {
-	if (this != &node) {
+	if (typeid(*this) == typeid(node) && this != &node) {
 		this->~AVLTreeNode();
 		new(this) AVLTreeNode<T>(*dynamic_cast<const AVLTreeNode<T>*>(&node));
 	}
@@ -38,9 +46,9 @@ AVLTreeNode<T>& AVLTreeNode<T>::operator = (const BinarySearchTreeNode<T>& node)
 
 template <class T>
 AVLTreeNode<T>& AVLTreeNode<T>::operator = (BinarySearchTreeNode<T>&& node) {
-	if (this != &node) {
+	if (typeid(*this) == typeid(node) && this != &node) {
 		this->~AVLTreeNode();
-		new(this) AVLTreeNode<T>(std::move(*dynamic_cast<const AVLTreeNode<T>*>(&node)));
+		new(this) AVLTreeNode<T>(std::move(*dynamic_cast<AVLTreeNode<T>*>(&node)));
 	}
 	return *this;
 }
@@ -125,11 +133,21 @@ AVLTree<T>::AVLTree()
 
 template <class T>
 AVLTree<T>::AVLTree(const BinarySearchTree<T>& tree)
-	: AVLTree<T>(*dynamic_cast<const AVLTree<T>*>(&tree)) { }
+	: BinarySearchTree<T>() {
+	if (typeid(*this) == typeid(tree)) {
+		this->~AVLTree();
+		new(this) AVLTree<T>(*dynamic_cast<const AVLTree<T>*>(&tree));
+	}
+}
 
 template <class T>
 AVLTree<T>::AVLTree(BinarySearchTree<T>&& tree)
-	: AVLTree<T>(std::move(*dynamic_cast<const AVLTree<T>*>(&tree))) { }
+	: BinarySearchTree<T>() {
+	if (typeid(*this) == typeid(tree)) {
+		this->~AVLTree();
+		new(this) AVLTree<T>(std::move(*dynamic_cast<AVLTree<T>*>(&tree)));
+	}
+}
 
 template <class T>
 AVLTree<T>::AVLTree(const AVLTree<T>& tree)
@@ -152,7 +170,7 @@ AVLTree<T>::~AVLTree() { }
 
 template <class T>
 AVLTree<T>& AVLTree<T>::operator = (const BinarySearchTree<T>& tree) {
-	if (this != &tree) {
+	if (typeid(*this) == typeid(tree) && this != &tree) {
 		this->~AVLTree();
 		new(this) AVLTree<T>(*dynamic_cast<const AVLTree<T>*>(&tree));
 	}
@@ -161,9 +179,9 @@ AVLTree<T>& AVLTree<T>::operator = (const BinarySearchTree<T>& tree) {
 
 template <class T>
 AVLTree<T>& AVLTree<T>::operator = (BinarySearchTree<T>&& tree) {
-	if (this != &tree) {
+	if (typeid(*this) == typeid(tree) && this != &tree) {
 		this->~AVLTree();
-		new(this) AVLTree<T>(std::move(*dynamic_cast<const AVLTree<T>*>(&tree)));
+		new(this) AVLTree<T>(std::move(*dynamic_cast<AVLTree<T>*>(&tree)));
 	}
 	return *this;
 }
@@ -290,41 +308,19 @@ AVLTree<T> AVLTree<T>::operator - (const T& data) const {
 }
 
 template <class T>
-AVLTree<T>& AVLTree<T>::operator += (const T& data) {
-	this->insert(data);
-	return *this;
-}
-
-template <class T>
-AVLTree<T>& AVLTree<T>::operator -= (const T& data) {
-	this->remove(data);
-	return *this;
-}
-
-template <class T>
 AVLTree<T> AVLTree<T>::operator + (const BinarySearchTree<T>& tree) const {
 	AVLTree<T> result = *this;
-	result.BinarySearchTree<T>::insert(tree.root);
+	if (typeid(*this) == typeid(tree))
+		result.BinarySearchTree<T>::insert(tree.root);
 	return result;
 }
 
 template <class T>
 AVLTree<T> AVLTree<T>::operator - (const BinarySearchTree<T>& tree) const {
 	AVLTree<T> result = *this;
-	result.BinarySearchTree<T>::remove(tree.root);
+	if (typeid(*this) == typeid(tree))
+		result.BinarySearchTree<T>::remove(tree.root);
 	return result;
-}
-
-template <class T>
-AVLTree<T>& AVLTree<T>::operator += (const BinarySearchTree<T>& tree) {
-	BinarySearchTree<T>::insert(tree.root);
-	return *this;
-}
-
-template <class T>
-AVLTree<T>& AVLTree<T>::operator -= (const BinarySearchTree<T>& tree) {
-	BinarySearchTree<T>::remove(tree.root);
-	return *this;
 }
 
 template <class T>
