@@ -1,5 +1,3 @@
-#include <iostream>
-
 template <class T>
 RBTreeNode<T>::RBTreeNode(const T& data, size_t counter, NodeColor color)
 	: BinarySearchTreeNode<T>(data, counter),
@@ -7,11 +5,21 @@ RBTreeNode<T>::RBTreeNode(const T& data, size_t counter, NodeColor color)
 
 template <class T>
 RBTreeNode<T>::RBTreeNode(const BinarySearchTreeNode<T>& node)
-	: RBTreeNode<T>(*dynamic_cast<const RBTreeNode<T>*>(&node)) { }
+	: BinarySearchTreeNode<T>() {
+	if (typeid(*this) == typeid(node)) {
+		this->~RBTreeNode();
+		new(this) RBTreeNode<T>(*dynamic_cast<const RBTreeNode<T>*>(&node));
+	}
+}
 
 template<class T>
 RBTreeNode<T>::RBTreeNode(BinarySearchTreeNode<T>&& node)
-	: RBTreeNode<T>(std::move(*dynamic_cast<RBTreeNode<T>*>(&node))) { }
+	: BinarySearchTreeNode<T>() {
+	if (typeid(*this) == typeid(node)) {
+		this->~RBTreeNode();
+		new(this) RBTreeNode<T>(std::move(*dynamic_cast<RBTreeNode<T>*>(&node)));
+	}
+}
 
 template <class T>
 RBTreeNode<T>::RBTreeNode(const RBTreeNode<T>& node)
@@ -30,8 +38,7 @@ RBTreeNode<T>::~RBTreeNode() { }
 
 template <class T>
 RBTreeNode<T>& RBTreeNode<T>::operator = (const BinarySearchTreeNode<T>& node) {
-	std::cout << "rb copy ass bst\n";
-	if (this != &node) {
+	if (typeid(*this) == typeid(node) && this != &node) {
 		this->~RBTreeNode();
 		new(this) RBTreeNode<T>(*dynamic_cast<const RBTreeNode<T>*>(&node));
 	}
@@ -40,8 +47,7 @@ RBTreeNode<T>& RBTreeNode<T>::operator = (const BinarySearchTreeNode<T>& node) {
 
 template <class T>
 RBTreeNode<T>& RBTreeNode<T>::operator = (BinarySearchTreeNode<T>&& node) {
-	std::cout << "rb move ass bst\n";
-	if (this != &node) {
+	if (typeid(*this) == typeid(node) && this != &node) {
 		this->~RBTreeNode();
 		new(this) RBTreeNode<T>(std::move(*dynamic_cast<RBTreeNode<T>*>(&node)));
 	}
@@ -50,7 +56,6 @@ RBTreeNode<T>& RBTreeNode<T>::operator = (BinarySearchTreeNode<T>&& node) {
 
 template <class T>
 RBTreeNode<T>& RBTreeNode<T>::operator = (const RBTreeNode<T>& node) {
-	std::cout << "rb copy ass rb\n";
 	if (this != &node) {
 		this->~RBTreeNode();
 		new(this) RBTreeNode<T>(node);
@@ -60,7 +65,6 @@ RBTreeNode<T>& RBTreeNode<T>::operator = (const RBTreeNode<T>& node) {
 
 template <class T>
 RBTreeNode<T>& RBTreeNode<T>::operator = (RBTreeNode<T>&& node) {
-	std::cout << "rb move ass rb\n";
 	if (this != &node) {
 		this->~RBTreeNode();
 		new(this) RBTreeNode<T>(std::move(node));
@@ -74,11 +78,13 @@ RBTreeNode<T>* RBTreeNode<T>::getLeft() const {
 }
 
 template <class T>
-void RBTreeNode<T>::setLeft(BinarySearchTreeNode<T>* node) {
+bool RBTreeNode<T>::setLeft(BinarySearchTreeNode<T>* node) {
+	if (typeid(*this) != typeid(*node))
+		return false;
 	this->left = node;
 	if (this->left)
 		this->getLeft()->parent = this;
-	return;
+	return true;
 }
 
 template <class T>
@@ -87,11 +93,13 @@ RBTreeNode<T>* RBTreeNode<T>::getRight() const {
 }
 
 template <class T>
-void RBTreeNode<T>::setRight(BinarySearchTreeNode<T>* node) {
+bool RBTreeNode<T>::setRight(BinarySearchTreeNode<T>* node) {
+	if (typeid(*this) != typeid(*node))
+		return false;
 	this->right = node;
 	if (this->right)
 		this->getRight()->parent = this;
-	return;
+	return true;
 }
 
 template <class T>
@@ -100,9 +108,11 @@ RBTreeNode<T>* RBTreeNode<T>::getParent() const {
 }
 
 template <class T>
-void RBTreeNode<T>::setParent(BinarySearchTreeNode<T>* node) {
+bool RBTreeNode<T>::setParent(BinarySearchTreeNode<T>* node) {
+	if (typeid(*this) != typeid(*node))
+		return false;
 	this->parent = node;
-	return;
+	return true;
 }
 
 template <class T>
@@ -161,36 +171,31 @@ bool RBTreeNode<T>::isEqual(const BinarySearchTreeNode<T>* node1, const BinarySe
 	return (isEqual(node1->left, node2->left) && isEqual(node1->right, node2->right));
 }
 
-
-
-
-
-
-
-
-
 template <class T>
 RBTree<T>::RBTree()
-	: BinarySearchTree<T>() {
-	std::cout << "rb def ctor\n";
-}
+	: BinarySearchTree<T>() { }
 
 template <class T>
 RBTree<T>::RBTree(const BinarySearchTree<T>& tree)
-	: RBTree<T>(*dynamic_cast<const RBTree<T>*>(&tree)) {
-	std::cout << "rb copy bst ctor\n";
+	: BinarySearchTree<T>() {
+	if (typeid(*this) == typeid(tree)) {
+		this->~RBTree();
+		new(this) RBTree<T>(*dynamic_cast<const RBTree<T>*>(&tree));
+	}
 }
 
 template <class T>
 RBTree<T>::RBTree(BinarySearchTree<T>&& tree)
-	: RBTree<T>(std::move(*dynamic_cast<RBTree<T>*>(&tree))) {
-	std::cout << "rb move bst ctor\n";
+	: BinarySearchTree<T>() {
+	if (typeid(*this) == typeid(tree)) {
+		this->~RBTree();
+		new(this) RBTree<T>(std::move(*dynamic_cast<RBTree<T>*>(&tree)));
+	}
 }
 
 template <class T>
 RBTree<T>::RBTree(const RBTree<T>& tree)
 	: BinarySearchTree<T>() {
-	std::cout << "rb copy rb ctor\n";
 	this->root = tree.root ? new RBTreeNode<T>(*dynamic_cast<RBTreeNode<T>*>(tree.root)) : nullptr;
 	this->size_ = tree.size_;
 	this->capacity_ = tree.capacity_;
@@ -199,20 +204,17 @@ RBTree<T>::RBTree(const RBTree<T>& tree)
 template <class T>
 RBTree<T>::RBTree(RBTree<T>&& tree)
 	: BinarySearchTree<T>() {
-	std::cout << "rb move rb ctor\n";
 	this->root = std::exchange(tree.root, nullptr);
 	this->size_ = std::exchange(tree.size_, 0);
 	this->capacity_ = std::exchange(tree.capacity_, 0);
 }
 
 template <class T>
-RBTree<T>::~RBTree() {
-	std::cout << "rb dtor\n";
-}
+RBTree<T>::~RBTree() { }
 
 template <class T>
 RBTree<T>& RBTree<T>::operator = (const BinarySearchTree<T>& tree) {
-	if (this != &tree) {
+	if (typeid(*this) == typeid(tree) && this != &tree) {
 		this->~RBTree();
 		new(this) RBTree<T>(*dynamic_cast<const RBTree<T>*>(&tree));
 	}
@@ -221,7 +223,7 @@ RBTree<T>& RBTree<T>::operator = (const BinarySearchTree<T>& tree) {
 
 template <class T>
 RBTree<T>& RBTree<T>::operator = (BinarySearchTree<T>&& tree) {
-	if (this != &tree) {
+	if (typeid(*this) == typeid(tree) && this != &tree) {
 		this->~RBTree();
 		new(this) RBTree<T>(std::move(*dynamic_cast<RBTree<T>*>(&tree)));
 	}
@@ -253,7 +255,6 @@ RBTreeNode<T>* RBTree<T>::search(const T& data) const {
 
 template <class T>
 void RBTree<T>::insert(const T& data, size_t counter) {
-	std::cout << "ins\n";
 	if (!this->root) {
 		this->root = new RBTreeNode<T>(data, counter);
 		this->size_ = counter;
@@ -301,7 +302,6 @@ size_t RBTree<T>::removeAll(const T& data) {
 	if (!(*toDelete))
 		return 0;
 	size_t deletedCount = (*toDelete)->counter;
-
 	if ((*toDelete)->left && (*toDelete)->right)
 		removeRedBlackTwo(*toDelete);
 	else if (!(*toDelete)->left && !(*toDelete)->right)
@@ -330,20 +330,18 @@ RBTree<T> RBTree<T>::operator - (const T& data) const {
 template <class T>
 RBTree<T> RBTree<T>::operator + (const BinarySearchTree<T>& tree) const {
 	RBTree<T> result = *this;
-	result.BinarySearchTree<T>::insert(tree.root);
+	if (typeid(*this) == typeid(tree))
+		result.BinarySearchTree<T>::insert(tree.root);
 	return result;
 }
 
 template <class T>
 RBTree<T> RBTree<T>::operator - (const BinarySearchTree<T>& tree) const {
 	RBTree<T> result = *this;
-	result.BinarySearchTree<T>::remove(tree.root);
+	if (typeid(*this) == typeid(tree))
+		result.BinarySearchTree<T>::remove(tree.root);
 	return result;
 }
-
-
-
-
 
 template <class T>
 RBTreeNode<T>* RBTree<T>::getMin() const {
@@ -451,10 +449,12 @@ template <class T>
 void RBTree<T>::removeRedBlackZero(BinarySearchTreeNode<T>* node) {
 	if (dynamic_cast<RBTreeNode<T>*>(node)->color == NodeColor::COLOR_BLACK)
 		fixRemove(dynamic_cast<RBTreeNode<T>*>(node));
-	if (node == dynamic_cast<RBTreeNode<T>*>(node)->getParent()->left)
+	if (node != this->root && node == dynamic_cast<RBTreeNode<T>*>(node)->getParent()->left)
 		dynamic_cast<RBTreeNode<T>*>(node)->getParent()->left = nullptr;
-	else
+	else if (node != this->root)
 		dynamic_cast<RBTreeNode<T>*>(node)->getParent()->right = nullptr;
+	if (node == this->root)
+		this->root = nullptr;
 	delete node;
 	return;
 }
