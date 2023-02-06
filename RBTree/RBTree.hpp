@@ -7,13 +7,14 @@ enum class NodeColor {
 	COLOR_RED
 };
 
+
 template <class T>
 class RBTreeNode : public BinarySearchTreeNode<T> {
 	template <class T1> friend class RBTree;
 
 protected:
 	BinarySearchTreeNode<T>*	parent;
-	NodeColor		color;
+	NodeColor			color;
 
 public:
 	RBTreeNode(const T& = T(), size_t = 1, NodeColor = NodeColor::COLOR_RED);
@@ -30,16 +31,16 @@ public:
 	virtual RBTreeNode<T>& operator = (RBTreeNode<T>&&);
 
 	virtual RBTreeNode<T>*	getLeft() const override;
-	virtual void			setLeft(BinarySearchTreeNode<T>*) override;
+	virtual bool		setLeft(BinarySearchTreeNode<T>*) override;
 
 	virtual RBTreeNode<T>*	getRight() const override;
-	virtual void			setRight(BinarySearchTreeNode<T>*) override;
+	virtual bool		setRight(BinarySearchTreeNode<T>*) override;
 
 	virtual RBTreeNode<T>*	getParent() const final;
-	virtual void			setParent(BinarySearchTreeNode<T>*) final;
+	virtual bool		setParent(BinarySearchTreeNode<T>*) final;
 
 	virtual NodeColor	getColor() const final;
-	virtual void	setColor(const NodeColor&) final;
+	virtual void		setColor(const NodeColor&) final;
 
 protected:
 	virtual void copy(const BinarySearchTreeNode<T>&) override;
