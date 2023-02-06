@@ -12,6 +12,9 @@ class BinarySearchTreeNode {
 	template <class T2> friend class AVLTree;
 	template <class N2> friend class AVLTreeNode;
 
+	template <class T3> friend class RBTree;
+	template <class N3> friend class RBTreeNode;
+
 protected:
 	T				data;
 	size_t				counter;
@@ -37,10 +40,10 @@ public:
 	virtual void	setCounter(const size_t) final;
 
 	virtual BinarySearchTreeNode<T>*	getLeft() const;
-	virtual void				setLeft(BinarySearchTreeNode<T>*) final;
+	virtual bool				setLeft(BinarySearchTreeNode<T>*);
 
 	virtual BinarySearchTreeNode<T>*	getRight() const;
-	virtual void				setRight(BinarySearchTreeNode<T>*) final;
+	virtual bool				setRight(BinarySearchTreeNode<T>*);
 
 protected:
 	virtual void copy(const BinarySearchTreeNode<T>&);
@@ -53,6 +56,7 @@ protected:
 template <class T>
 class BinarySearchTree {
 	template <class T1> friend class AVLTree;
+	template <class T2> friend class RBTree;
 
 protected:
 	BinarySearchTreeNode<T>*	root;
@@ -79,14 +83,14 @@ public:
 	BinarySearchTree<T> operator + (const T&) const;
 	BinarySearchTree<T> operator - (const T&) const;
 
-	virtual BinarySearchTree<T>& operator += (const T&);
-	virtual BinarySearchTree<T>& operator -= (const T&);
+	virtual BinarySearchTree<T>& operator += (const T&) final;
+	virtual BinarySearchTree<T>& operator -= (const T&) final;
 
 	BinarySearchTree<T> operator + (const BinarySearchTree<T>&) const;
 	BinarySearchTree<T> operator - (const BinarySearchTree<T>&) const;
 
-	virtual BinarySearchTree<T>& operator += (const BinarySearchTree<T>&);
-	virtual BinarySearchTree<T>& operator -= (const BinarySearchTree<T>&);
+	virtual BinarySearchTree<T>& operator += (const BinarySearchTree<T>&) final;
+	virtual BinarySearchTree<T>& operator -= (const BinarySearchTree<T>&) final;
 
 	virtual void merge(const BinarySearchTree<T>&) final;
 	virtual void exclude(const BinarySearchTree<T>&) final;
