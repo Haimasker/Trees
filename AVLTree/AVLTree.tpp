@@ -344,6 +344,16 @@ AVLTreeNode<T>* AVLTree<T>::getMax() const {
 }
 
 template <class T>
+AVLTreeNode<T>* AVLTree<T>::getPredecessor(const T& data) const {
+	return dynamic_cast<AVLTreeNode<T>*>(BinarySearchTree<T>::getPredecessor(data));
+}
+
+template <class T>
+AVLTreeNode<T>* AVLTree<T>::getSuccessor(const T& data) const {
+	return dynamic_cast<AVLTreeNode<T>*>(BinarySearchTree<T>::getSuccessor(data));
+}
+
+template <class T>
 std::vector<AVLTreeNode<T>*> AVLTree<T>::preorderDFS() const {
 	std::vector<BinarySearchTreeNode<T>*> tmp = BinarySearchTree<T>::preorderDFS();
 	std::vector<AVLTreeNode<T>*> result;
