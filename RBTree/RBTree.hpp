@@ -79,6 +79,9 @@ public:
 	virtual RBTreeNode<T>* getMin() const override;
 	virtual RBTreeNode<T>* getMax() const override;
 
+	virtual RBTreeNode<T>* getPredecessor(const T&) const override;
+	virtual RBTreeNode<T>* getSuccessor(const T&) const override;
+
 	std::vector<RBTreeNode<T>*> preorderDFS() const;
 	std::vector<RBTreeNode<T>*> inorderDFS() const;
 	std::vector<RBTreeNode<T>*> postorderDFS() const;
