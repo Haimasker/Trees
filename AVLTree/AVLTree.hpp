@@ -69,6 +69,9 @@ public:
 	virtual AVLTreeNode<T>* getMin() const override;
 	virtual AVLTreeNode<T>* getMax() const override;
 
+	virtual AVLTreeNode<T>* getPredecessor(const T&) const override;
+	virtual AVLTreeNode<T>* getSuccessor(const T&) const override;
+
 	std::vector<AVLTreeNode<T>*> preorderDFS() const;
 	std::vector<AVLTreeNode<T>*> inorderDFS() const;
 	std::vector<AVLTreeNode<T>*> postorderDFS() const;
