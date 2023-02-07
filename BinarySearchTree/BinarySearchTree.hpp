@@ -106,6 +106,9 @@ public:
 	virtual BinarySearchTreeNode<T>* getMin() const;
 	virtual BinarySearchTreeNode<T>* getMax() const;
 
+	virtual BinarySearchTreeNode<T>* getPredecessor(const T&) const;
+	virtual BinarySearchTreeNode<T>* getSuccessor(const T&) const;
+
 	std::vector<BinarySearchTreeNode<T>*> preorderDFS() const;
 	std::vector<BinarySearchTreeNode<T>*> inorderDFS() const;
 	std::vector<BinarySearchTreeNode<T>*> postorderDFS() const;
