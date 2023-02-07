@@ -410,6 +410,42 @@ BinarySearchTreeNode<T>* BinarySearchTree<T>::getMax() const {
 }
 
 template <class T>
+BinarySearchTreeNode<T>* BinarySearchTree<T>::getPredecessor(const T& data) const {
+	BinarySearchTreeNode<T>* current = this->root;
+	BinarySearchTreeNode<T>* predecessor = nullptr;
+
+	while (current) {
+		if (data > current->data) {
+			predecessor = current;
+			current = current->right;
+		}
+		else if (data < current->data)
+			current = current->left;
+		else
+			break;
+	}
+	return (current->left ? getMax(current->left) : predecessor);
+}
+
+template <class T>
+BinarySearchTreeNode<T>* BinarySearchTree<T>::getSuccessor(const T& data) const {
+	BinarySearchTreeNode<T>* current = this->root;
+	BinarySearchTreeNode<T>* successor = nullptr;
+
+	while (current) {
+		if (data < current->data) {
+			successor = current;
+			current = current->left;
+		}
+		else if (data > current->data)
+			current = current->right;
+		else
+			break;
+	}
+	return (current->right ? getMin(current->right) : successor);
+}
+
+template <class T>
 std::vector<BinarySearchTreeNode<T>*> BinarySearchTree<T>::preorderDFS() const {
 	std::vector<BinarySearchTreeNode<T>*> result;
 	preorderDFS(this->root, result);
