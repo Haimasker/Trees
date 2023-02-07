@@ -354,6 +354,16 @@ RBTreeNode<T>* RBTree<T>::getMax() const {
 }
 
 template <class T>
+RBTreeNode<T>* RBTree<T>::getPredecessor(const T& data) const {
+	return dynamic_cast<RBTreeNode<T>*>(BinarySearchTree<T>::getPredecessor(data));
+}
+
+template <class T>
+RBTreeNode<T>* RBTree<T>::getSuccessor(const T& data) const {
+	return dynamic_cast<RBTreeNode<T>*>(BinarySearchTree<T>::getSuccessor(data));
+}
+
+template <class T>
 std::vector<RBTreeNode<T>*> RBTree<T>::preorderDFS() const {
 	std::vector<BinarySearchTreeNode<T>*> tmp = BinarySearchTree<T>::preorderDFS();
 	std::vector<RBTreeNode<T>*> result;
